@@ -2,7 +2,7 @@ NAME
     Net::ClientServer - A client/server platform for IPC on localhost
 
 VERSION
-    version 0.0006
+    version 0.0007
 
 SYNOPSIS
     The minimum configuration (specify a port):

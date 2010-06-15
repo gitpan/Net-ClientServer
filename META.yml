@@ -19,4 +19,4 @@ requires:
   File::HomeDir: 0
   IO::Socket::INET: 0
   Path::Class: 0
-version: 0.0006
+version: 0.0007

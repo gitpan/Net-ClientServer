@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
                                            },
                        'ABSTRACT' => 'A client/server platform for IPC on localhost',
                        'EXE_FILES' => [],
-                       'VERSION' => '0.0006',
+                       'VERSION' => '0.0007',
                        'PREREQ_PM' => {
                                         'File::HomeDir' => '0',
                                         'Any::Moose' => '0',
