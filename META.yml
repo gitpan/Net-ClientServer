@@ -1,5 +1,5 @@
 ---
-abstract: 'Implement a basic client/server architecture using a single platform'
+abstract: 'A client/server platform for IPC on localhost'
 author:
   - 'Robert Krimen <robertkrimen@gmail.com>'
 build_requires:
@@ -19,4 +19,4 @@ requires:
   File::HomeDir: 0
   IO::Socket::INET: 0
   Path::Class: 0
-version: 0.0005
+version: 0.0006

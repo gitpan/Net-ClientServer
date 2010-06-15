@@ -21,9 +21,9 @@ my %WriteMakefileArgs = (
                        'BUILD_REQUIRES' => {
                                              'Test::Most' => '0'
                                            },
-                       'ABSTRACT' => 'Implement a basic client/server architecture using a single platform',
+                       'ABSTRACT' => 'A client/server platform for IPC on localhost',
                        'EXE_FILES' => [],
-                       'VERSION' => '0.0005',
+                       'VERSION' => '0.0006',
                        'PREREQ_PM' => {
                                         'File::HomeDir' => '0',
                                         'Any::Moose' => '0',

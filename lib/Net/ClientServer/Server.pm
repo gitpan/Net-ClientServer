@@ -10,11 +10,14 @@ sub server_socket {
     my %options = @_;
 
     my $host = $options{host};
-    $host = 0 unless defined $host; # IPV6?
+#    $host = 0 unless defined $host; # IPV6?
     my $port = $options{port};
 
+    my @arguments;
+    push @arguments, LocalHost => $host if $host;
+
     my $socket = IO::Socket::INET->new( 
-        LocalHost => $host,
+        @arguments,
         LocalPort => $port,
         Proto => 'tcp',
         ReuseAddr => 1,

@@ -1,12 +1,16 @@
 package Net::ClientServer;
 BEGIN {
-  $Net::ClientServer::VERSION = '0.0005';
+  $Net::ClientServer::VERSION = '0.0006';
 }
-# ABSTRACT: Implement a basic client/server architecture using a single platform
+# ABSTRACT: A client/server platform for IPC on localhost
 
 use strict;
 use warnings;
 
+
+#The API is still young and pretty fluid. See the SYNOPSIS for examples (for now)
+
+#Daemonization (via C<< ->start >>) is on by default, disable it with: C<< daemon => 0 >>
 
 use Any::Moose;
 
@@ -17,8 +21,9 @@ use File::HomeDir;
 use Path::Class;
 use Carp;
 use Net::ClientServer::Server;
+use Socket qw/ INADDR_ANY INADDR_LOOPBACK /;
 
-has host => qw/ is ro /;
+has host => qw/ is ro /, default => 'localhost';
 has port => qw/ is ro required 1 /;
 
 has [ map { "${_}_routine" } qw/ start stop serve run / ] => qw/ is rw isa Maybe[CodeRef] /;
@@ -134,11 +139,33 @@ sub server_socket {
     return Net::ClientServer::Server->server_socket( host => $self->host, port => $self->port, @_ );
 }
 
+sub _is_localhost {
+    my $self = shift;
+    my $host = shift;
+
+    return 1 unless $host;
+    return 1 if $host eq '::' or
+                $host eq '0.0.0.0' or
+                $host eq INADDR_ANY or
+                $host eq INADDR_LOOPBACK;
+    return 1 if eval {
+        require Socket6;
+        return 1 if $host eq &Socket6::in6addr_any or
+                    $host eq &Socket6::in6addr_loopback;
+        
+    };
+    return 0;
+}
+
 sub client_socket {
     my $self = shift;
+
+    my @arguments;
+
     my $host = $self->host;
-    $host = 'localhost' unless defined $host && length $host;
+    $host = 'localhost' if $self->_is_localhost( $host );
     my $port = $self->port;
+
     return IO::Socket::INET->new( PeerHost => $host, PeerPort => $port, Proto => 'tcp' );
 }
 
@@ -293,11 +320,11 @@ __END__
 
 =head1 NAME
 
-Net::ClientServer - Implement a basic client/server architecture using a single platform
+Net::ClientServer - A client/server platform for IPC on localhost
 
 =head1 VERSION
 
-version 0.0005
+version 0.0006
 
 =head1 SYNOPSIS
 
@@ -337,7 +364,7 @@ With a basic startup & serve/accept routine:
 
 =head1 DESCRIPTION
 
-Met::ClientServer is a tool for implementing a basic client/server architecture using a single platform. It is easily configured for daemonizing and maintaining state on disk (pidfile & stderr).
+Net::ClientServer is a tool for implementing a basic client/server architecture using a single platform (particularly useful when doing IPC on the localhost). It is easily configured for daemonizing and maintaining state on disk (pidfile & stderr).
 
 The minimum configuration is very simple, requiring only a port number:
 
@@ -350,9 +377,34 @@ The minimum configuration is very simple, requiring only a port number:
 
 =head1 USAGE
 
-The API is still young and pretty fluid. See the SYNOPSIS for examples (for now)
+=head2 $platform = Net::ClientServer->new( ... )
 
-Daemonization (via C<< ->start >>) is on by default, disable it with: C<< daemon => 0 >>
+    port                The port to listen on/connect to
+
+    host                The host to listen on/connect to, 'localhost' by default
+
+    name                The name of the platform. If given without specifying the
+                        home parameter, then pidfile and stderr will be put in
+                        ~/.$name/
+
+    home                The home directory for the platform. The pidfile and stderr will be
+                        placed in this directory
+
+    pidfile             The name of the pidfile, 'pid' by default.
+
+    stderr              The name of file to output stderr to, 'stderr' by default
+
+If neither C<home> nor C<name> are given, then a pidfile and stderr file will not be generated
+
+=head2 $platform->start
+
+Start the server if it is not already running
+
+=head2 $platform->started
+
+Return true if the server is running. If a pidfile is available, then it will check to see
+that the process is running. If a pidfile is unavailable, or the process does not seem
+to be running, it will check to see if it can connect to the server
 
 =head1 SEE ALSO
 

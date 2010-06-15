@@ -1,9 +1,8 @@
 NAME
-    Net::ClientServer - Implement a basic client/server architecture using a
-    single platform
+    Net::ClientServer - A client/server platform for IPC on localhost
 
 VERSION
-    version 0.0005
+    version 0.0006
 
 SYNOPSIS
     The minimum configuration (specify a port):
@@ -41,9 +40,10 @@ SYNOPSIS
         $platform->start;
 
 DESCRIPTION
-    Met::ClientServer is a tool for implementing a basic client/server
-    architecture using a single platform. It is easily configured for
-    daemonizing and maintaining state on disk (pidfile & stderr).
+    Net::ClientServer is a tool for implementing a basic client/server
+    architecture using a single platform (particularly useful when doing IPC
+    on the localhost). It is easily configured for daemonizing and
+    maintaining state on disk (pidfile & stderr).
 
     The minimum configuration is very simple, requiring only a port number:
 
@@ -55,11 +55,33 @@ DESCRIPTION
         $platform->client_socket;
 
 USAGE
-    The API is still young and pretty fluid. See the SYNOPSIS for examples
-    (for now)
+  $platform = Net::ClientServer->new( ... )
+        port                The port to listen on/connect to
 
-    Daemonization (via "->start") is on by default, disable it with: "daemon
-    => 0"
+        host                The host to listen on/connect to, 'localhost' by default
+
+        name                The name of the platform. If given without specifying the
+                            home parameter, then pidfile and stderr will be put in
+                            ~/.$name/
+
+        home                The home directory for the platform. The pidfile and stderr will be
+                            placed in this directory
+
+        pidfile             The name of the pidfile, 'pid' by default.
+
+        stderr              The name of file to output stderr to, 'stderr' by default
+
+    If neither "home" nor "name" are given, then a pidfile and stderr file
+    will not be generated
+
+  $platform->start
+    Start the server if it is not already running
+
+  $platform->started
+    Return true if the server is running. If a pidfile is available, then it
+    will check to see that the process is running. If a pidfile is
+    unavailable, or the process does not seem to be running, it will check
+    to see if it can connect to the server
 
 SEE ALSO
     Net::Server
